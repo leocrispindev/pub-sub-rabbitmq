@@ -22,8 +22,6 @@ func initConnection() {
 	log.Println("Connection OK")
 	openChannel(conn)
 
-	defer conn.Close()
-
 }
 
 func openChannel(conn *amqp.Connection) {
@@ -35,28 +33,70 @@ func openChannel(conn *amqp.Connection) {
 	}
 
 	log.Println("Channel OK")
+	channel = ch
 
-	declareExchnage(ch)
+	declareExchange(channel)
+	bindQueues(channel)
+
 }
 
-// Criando e definindo os topicos de direcionamento na exchange
-func declareExchnage(channel *amqp.Channel) {
-	topics := []string{"logs_topic", "messages_topic"}
+func declareExchange(channel *amqp.Channel) {
 
-	//Interando sobre a lista de topicos que a exchnage mapear
-	for _, topic := range topics {
-		err := channel.ExchangeDeclare(
-			topic, "topic", true, false, false, false, nil, // arguments
-		)
+	err := channel.ExchangeDeclare(
+		"example-rabbitmq_exchange", "topic", true, false, false, false, nil, // arguments
+	)
 
-		if err != nil {
-			log.Panic("Error to declare excnage topic: " + topic)
-
-		}
-
-		log.Println("Exhnage declared topic: " + topic)
-
+	if err != nil {
+		log.Panic("Error on declare exchange")
 	}
+
+	log.Println("Success exchange declare")
+
+}
+
+// Esse fluxo só é necessário para que a aplicação crie as filas de mensagens na hora que inicializar
+func bindQueues(ch *amqp.Channel) {
+	// Declarar uma fila
+	qMessages, err := ch.QueueDeclare(
+		"queue_messages", // nome da fila
+		true,             // durable - para manter durante o restart do rabbitmq
+		false, false, false, nil,
+	)
+
+	if err != nil {
+		log.Panic("Error on create queue", err)
+	}
+
+	// Cria a 'conexão' entre a exchange e a fila
+	err = ch.QueueBind(
+		qMessages.Name,              // nome da fila
+		"messages_topic.key",        // chave de roteamento
+		"example-rabbitmq_exchange", // nome da exchange
+		false,
+		nil,
+	)
+
+	if err != nil {
+		log.Panic("Error on bind queue", err)
+	}
+
+	log.Printf("Created and bind [queue]=%s", qMessages.Name)
+
+	qLogs, err := ch.QueueDeclare(
+		"queue_logs", // nome da fila
+		true,         // durable - para manter durante o restart do rabbitmq
+		false, false, false, nil,
+	)
+
+	err = ch.QueueBind(
+		qLogs.Name,
+		"logs_topic.key",
+		"example-rabbitmq_exchange",
+		false,
+		nil,
+	)
+
+	log.Printf("Created and bind [queue]=%s", qMessages.Name)
 
 }
 
