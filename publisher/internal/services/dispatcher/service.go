@@ -13,7 +13,7 @@ var publisher *pubService.Publisher
 
 func Init() {
 	publisher = new(pubService.Publisher)
-	publisher.Constructor()
+	publisher.Init()
 
 	startRandomMessages()
 }

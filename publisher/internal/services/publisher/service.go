@@ -13,7 +13,7 @@ type Publisher struct {
 	broker *amqp.Channel
 }
 
-func (p *Publisher) Constructor() {
+func (p *Publisher) Init() {
 	p.broker = broker.GetChannel()
 }
 
