@@ -21,12 +21,12 @@ func Init() {
 func startRandomMessages() {
 	ctx := context.Background()
 
-	log(ctx, "INFO", "Iniciando dispatch automatico")
+	log(ctx, "INFO", "Iniciando dispatch")
 
 	for {
 		proccessId := uuid.New().String()
 
-		log(ctx, "INFO", "Starting dispatch batch messages [id]= "+proccessId)
+		log(ctx, "INFO", "Start dispatch batch messages [id]= "+proccessId)
 
 		for i := 0; i < 10; i++ {
 			msg, id := generateMessage()
@@ -43,6 +43,7 @@ func startRandomMessages() {
 
 		}
 
+		log(ctx, "INFO", "Finish dispatch batch messages [id]= "+proccessId)
 		time.Sleep(2 * time.Second)
 
 	}
@@ -58,6 +59,7 @@ func generateMessage() (string, string) {
 }
 
 func log(ctx context.Context, level string, message string) {
+	body := fmt.Sprintf("[LEVEL]=%s [BODY]=%s", level, message)
 
-	publisher.Send(ctx, "logs_topic.key", []byte(message))
+	publisher.Send(ctx, "logs_topic.key", []byte(body))
 }
