@@ -5,6 +5,7 @@ import (
 	"os"
 	"publisher-subscriber-rabbitmq/subscriber/internal/broker"
 	csm "publisher-subscriber-rabbitmq/subscriber/internal/services/consumer"
+	"time"
 
 	"github.com/rabbitmq/amqp091-go"
 )
@@ -13,6 +14,9 @@ func main() {
 	if len(os.Args) < 1 {
 		panic("Invalid parameter: queue is missing")
 	}
+
+	waitInit := 5 * time.Second
+	time.Sleep(waitInit)
 
 	broker.Init()
 

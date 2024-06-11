@@ -1,7 +1,11 @@
 package broker
 
 import (
+	"fmt"
 	"log"
+	"net"
+	"os"
+	"time"
 
 	amqp "github.com/rabbitmq/amqp091-go"
 )
@@ -13,7 +17,27 @@ func Init() {
 }
 
 func initConnection() {
-	conn, err := amqp.Dial("amqp://userguest:user123@localhost:5672/")
+	host := os.Getenv("BROKER_HOST")
+
+	if host == "" {
+		host = "localhost"
+	}
+
+	connectionHost := fmt.Sprintf("amqp://userguest:user123@%s:5672/", host)
+
+	connTimeout := 5 * time.Second
+
+	dialer := &net.Dialer{
+		Timeout: connTimeout,
+	}
+
+	amqpConfig := amqp.Config{
+		Dial: func(network, addr string) (net.Conn, error) {
+			return dialer.Dial(network, addr)
+		},
+	}
+
+	conn, err := amqp.DialConfig(connectionHost, amqpConfig)
 
 	if err != nil {
 		log.Panic("Error on open connection to broker", err)
