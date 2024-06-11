@@ -1,18 +1,69 @@
 version: '3.8'
 
 services:
+  publisher:
+    image: leocrispindev/pubsubrabbitmq/publisher:v0.0.5
+    container_name: publisher
+    environment:
+      - BROKER_HOST=broker
+    depends_on:
+      - rabbitmq
+    networks:
+        default:
+          aliases:
+            - publisher
   rabbitmq:
     image: rabbitmq:3-management
     container_name: rabbitmq
+    hostname: broker
     ports:
       - "5672:5672" 
       - "15672:15672"
     environment:
       RABBITMQ_DEFAULT_USER: userguest
       RABBITMQ_DEFAULT_PASS: user123
+    networks:
+        default:
+          aliases:
+            - broker
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
+
+  subscriber_messages:
+    image: leocrispindev/pubsubrabbitmq/subscriber:v0.0.1
+    command: ["./subscriber", "queue_messages"]
+    container_name: subscriber_messages_01
+    environment:
+      - BROKER_HOST=broker
+    depends_on:
+      - rabbitmq
+      - publisher
+
+  subscriber_messages2:
+    image: leocrispindev/pubsubrabbitmq/subscriber:v0.0.1
+    command: ["./subscriber", "queue_messages"]
+    container_name: subscriber_messages_02
+    environment:
+      - BROKER_HOST=broker
+    depends_on:
+      - rabbitmq
+      - publisher
+  
+  subscriber_logs:
+    image: leocrispindev/pubsubrabbitmq/subscriber:v0.0.1
+    command: ["./subscriber", "queue_logs"]
+    container_name: subscriber_logs
+    environment:
+      - BROKER_HOST=broker
+    depends_on:
+      - rabbitmq
+      - publisher
 
 volumes:
   rabbitmq_data:
     driver: local
+
+networks:
+  default:
+    driver: bridge
+    name: pub-sub-rabbitmq
