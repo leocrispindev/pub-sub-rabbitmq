@@ -41,6 +41,6 @@ func handleMessage(message amqp091.Delivery) {
 	messageId := message.MessageId
 	textMessage := string(message.Body) // Deserialize o body da mensagem
 
-	log.Printf("[id]=%s [body]=%s", messageId, textMessage)
+	log.Printf("[body]=%s", messageId, textMessage)
 
 }
