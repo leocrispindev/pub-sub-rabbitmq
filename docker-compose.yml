@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   publisher:
-    image: leocrispindev/pubsubrabbitmq/publisher:v0.0.5
+    image: leocrispindev/pubsubrabbitmq-publisher:v0.0.5
     container_name: publisher
     environment:
       - BROKER_HOST=broker
@@ -30,7 +30,7 @@ services:
       - rabbitmq_data:/var/lib/rabbitmq
 
   subscriber_messages:
-    image: leocrispindev/pubsubrabbitmq/subscriber:v0.0.1
+    image: leocrispindev/pubsubrabbitmq-subscriber:v0.0.1
     command: ["./subscriber", "queue_messages"]
     container_name: subscriber_messages_01
     environment:
@@ -40,7 +40,7 @@ services:
       - publisher
 
   subscriber_messages2:
-    image: leocrispindev/pubsubrabbitmq/subscriber:v0.0.1
+    image: leocrispindev/pubsubrabbitmq-subscriber:v0.0.1
     command: ["./subscriber", "queue_messages"]
     container_name: subscriber_messages_02
     environment:
@@ -50,7 +50,7 @@ services:
       - publisher
   
   subscriber_logs:
-    image: leocrispindev/pubsubrabbitmq/subscriber:v0.0.1
+    image: leocrispindev/pubsubrabbitmq-subscriber:v0.0.1
     command: ["./subscriber", "queue_logs"]
     container_name: subscriber_logs
     environment:
@@ -66,4 +66,4 @@ volumes:
 networks:
   default:
     driver: bridge
-    name: pub-sub-rabbitmq
+    name: pub-sub-rabbitmqß
