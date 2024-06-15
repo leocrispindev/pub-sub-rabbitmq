@@ -1,6 +1,6 @@
 # Publisher/Subscriber com RabbitMQ
 
-Esse projeto tem como objetivo implementar os conceitos de pub/sub em sistemas distribuídos.Para isso vamos utilizar o message broker RabbitMQ
+Esse projeto tem como objetivo apresenter os conceitos de pub/sub em sistemas distribuídos.Para isso vamos utilizar o message broker RabbitMQ
 ### Stack:
 
 - Golang
